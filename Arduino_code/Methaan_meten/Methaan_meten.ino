@@ -1,4 +1,3 @@
-
 int pins[] = {A0};
 int numMetingen = 1000;
 void setup() {
@@ -22,6 +21,3 @@ void loop() {
       Serial.print(",");
     Serial.println(output[j]);
     }
-    
-  }
-}
