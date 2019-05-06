@@ -1,12 +1,23 @@
+/* This script controls the Arduino
+ * Two variables to be modified : 
+ * pins controls which pins are read from
+ * numMetingen controls over how many measurements we average
+ * This needs to be over a multiple of 20ms
+ * One measurement takes 112 microseconds
+ */
 int pins[] = {A0};
-int numMetingen = 178;
+
+int numMetingen = 178; 
+
 long ts_start, ts_meet;
 void setup() {
-  // put your setup code here, to run once:
+  
   Serial.begin(9600);
+  
   for(int i = 0; i < sizeof(pins)/sizeof(int);i++){
     pinMode(pins[i], INPUT);
   }
+  
   ts_start = millis();
 }
 void loop() {
@@ -16,16 +27,15 @@ void loop() {
     for(int i = 0; i < numMetingen; i++){
       output += analogRead(pins[i]);
     }
+    
     ts_meet = millis();
-    //Serial.println(ts_end - ts_start);
-    for(int j = 0; j < 1; j++){
-      long t =(ts_meet - ts_start);
-      Serial.print(pins[i]);
-      Serial.print(",");
-      Serial.print(t);
-      Serial.print(",");
-      Serial.println(output/numMetingen);
-    }
+    long t =(ts_meet - ts_start);
+    Serial.print(pins[i]);
+    Serial.print(",");
+    Serial.print(t);
+    Serial.print(",");
+    Serial.println(output/numMetingen);
+    
     delay(60000);
   }
 }

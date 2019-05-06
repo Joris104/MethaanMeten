@@ -10,18 +10,27 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib import style
-####################################################
-#########    Variables to set in script     ########
-####################################################
-
-port = '/dev/ttyACM0'	#format : '/dev/{something}' on Linux, 'COM{X}' on Windows
-filename = None #set to none to just use the date. Extension is added automatically
-debug = 1 #set to 1 for more debug info
-pins = [54] #the pins we will be collecting data on
 
 ####################################################
-#########         Variable Handling         ########
+#########    Variables to set in script    							 ########
 ####################################################
+
+#Port has to be set to the USB port connected to the Arduino. Format :  '/dev/{something}' on Linux, 'COM{something}' on Windows
+#filename is the name of the file where data is saved. 'None' simply uses the date of the measurement. Extention is added automatically and should not be added here0
+#debug controls how much info is displayed on the command prompt. Levels are 0,1 and 2
+#pins controls which pins we are collecting data from
+
+port = '/dev/ttyACM0'
+filename = None 
+debug = 1 
+pins = [54] 
+
+####################################################
+#########         Variable Handling        								  ########
+####################################################
+
+#We set the filename to the date if none was specified
+
 exitFlag = False
 if filename == None:
 		d = date.today()
@@ -29,8 +38,10 @@ if filename == None:
 	
 	
 ####################################################
-#########         Live Plot Handler         ########
+#########         Live Plot Handler         								########
 ####################################################
+ 
+#This draws the live plot 
 
 def animate(i, port, filename, debug, pins):
 	if filename == None:
@@ -50,7 +61,8 @@ def animate(i, port, filename, debug, pins):
 		try:
 			pin,time,measurement = line.split(',')
 		except:
-			continue
+			continue 
+			#Sometimes, faultive data gets through (for example a line with too many arguments). This simply ignores such a line and continues on the next one
 		try:
 			idx = pins.index(int(pin))
 		except:
@@ -66,7 +78,7 @@ def animate(i, port, filename, debug, pins):
 	for i in range(len(pins)):
 		ax1.plot(xs[i],ys[i])
 		if debug > 1:
-			print('Data plotted success')
+			print('Data plotted')
 	
 style.use('fivethirtyeight')
 fig = plt.figure()
@@ -76,14 +88,15 @@ def animationHandler(fig):
 	global exitFlag
 	ani = animation.FuncAnimation(fig,animate,fargs=(port,filename,debug,pins), interval = 1000)
 	plt.show()
-	exitFlag = True
+	#This part of the code only executes once the plot was closed by the user
+	exitFlag = True 
 
 #####################################################
-#########        Connection Handler         #########
+#########        Connection Handler         							   #########
 #####################################################
 
 def arduinoHandler(port,filename,debug,pins):
-	#Arduino Handler
+	#This handles the connection with the Arduino
 	global exitFlag
 	try :
 		arduino = serial.Serial(port, 9600)
@@ -125,6 +138,9 @@ def arduinoHandler(port,filename,debug,pins):
 			print("Keyboard Interruption - closing")
 			break
 		except ValueError:
+			#Sometimes the Arduino sends incomplete data. This handles such a case
+			if debug > 1:
+				print("A ValueError occured. The data recieved from the arduino :"+w)
 			continue
 		#Handling unexpected errors
 		except:
@@ -137,12 +153,13 @@ def arduinoHandler(port,filename,debug,pins):
 				print("It is recommended to unplug the Arduino before launching this script again to avoid further errors")
 			finally:
 				raise
+
+
 ###################################################################
-##########                     Threading                  #########
+##########                     Threading                  													#########
 ###################################################################
 
 
 arduinoThread = threading.Thread(target=arduinoHandler, args=(port,filename,debug,pins))
 arduinoThread.start()
-#arduinoHandler(port,filename,debug,pins)
 animationHandler(fig)

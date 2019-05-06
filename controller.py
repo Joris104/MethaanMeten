@@ -5,7 +5,7 @@ from datetime import datetime
 from datetime import timedelta
 from os import system
 	
-	
+### THIS SCRIPT IS ANTIQUATED AND REPLACED WITH METHANENOSE.PY ###
 
 arduino = serial.Serial('/dev/ttyACM0', 9600)
 d = date.today()
