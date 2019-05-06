@@ -12,9 +12,16 @@ d = date.today()
 d_string = d.strftime("%y-%m-%d")
 data_file = open(r"Data/"+d_string+".csv","w+")
 print("Comms opened")
+c = 0
 while True:
-	t = datetime.now()
-	var = arduino.readline()
-	w = var.decode()[:-2]
-	data_file.write(w+'\n')
-	print(w)
+	try :
+		t = datetime.now()
+		var = arduino.readline()
+		w = var.decode()[:-2]
+		if c>50:
+			data_file.write(w+'\n')
+			print(w)
+		c += 1
+	except KeyboardInterrupt:
+		arduino.close()
+		data_file.close()

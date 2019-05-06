@@ -1,0 +1,73 @@
+######################################################
+##############      Foutbeheer - Protoype I                     ################
+######################################################
+
+import sys
+import numpy as np
+import math
+import matplotlib.pyplot as plt
+#variables
+def foutBeheer(rs,pct_fout,abs_fout = 100):
+	#rs is the value of the sensor resistor
+	#pct_fout is the expected error in percentage of the resistor
+	#abs_fout is the expected max absolute error on the resistor, and is optional
+	#this function uses the largest of the two errors
+
+	Rs = rs
+	
+	
+	error_range = max(round(Rs*pct_fout/100),abs_fout) #in ohm
+	
+	# Theoretical model of our prototype
+	#Resistors
+	R1 = 4300
+	R2 = 43300*0.1
+	R3 = 4300
+	R4 = 1500e3
+	R5 = 1500e3
+	R6 = 1500e3
+	R7 = 1500e3
+	
+	
+	#Power source
+	Vin = 5
+	
+	
+	Rs_min = Rs - error_range
+	Rs_max = Rs + error_range
+
+	#OpAmps
+	ampH =  - R2/R3
+	ampL_min =  - Rs_min/R3
+	ampL_max =  - Rs_max/R3
+	ampL =  - Rs/R3
+
+
+	#Voltage at the output of the buffers
+	Vhigh = Vin*ampH
+	
+	Vlow = Vin*ampL
+	Vlow_min = Vin*ampL_min
+	Vlow_max = Vin*ampL_max
+	
+	Vuit = Vlow - Vhigh
+	Vuit_min = Vlow_min - Vhigh
+	Vuit_max = Vlow_max - Vhigh
+	
+	#print([Vuit,Vuit_min,Vuit_max])
+	return [Vuit,Vuit_min,Vuit_max]
+
+Vuit = []
+Vuit_min = []
+Vuit_max = []
+for i  in range(1,10):
+	(V1,V2,V3) = foutBeheer(43300*i/100,0,500)
+	Vuit.append(V1)
+	Vuit_min.append(V2)
+	Vuit_max.append(V3)
+
+fig = plt.figure()
+plt.plot(Vuit)
+plt.plot(Vuit_min)
+plt.plot(Vuit_max)
+plt.show()

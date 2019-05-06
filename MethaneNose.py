@@ -14,10 +14,10 @@ from matplotlib import style
 #########    Variables to set in script     ########
 ####################################################
 
-port = 'COM3'	#format : '/dev/{something}' on Linux, 'COM{X}' on Windows
+port = '/dev/ttyACM0'	#format : '/dev/{something}' on Linux, 'COM{X}' on Windows
 filename = None #set to none to just use the date. Extension is added automatically
 debug = 1 #set to 1 for more debug info
-pins = [14] #the pins we will be collecting data on
+pins = [54] #the pins we will be collecting data on
 
 ####################################################
 #########         Variable Handling         ########
@@ -58,7 +58,7 @@ def animate(i, port, filename, debug, pins):
 				print("Tried to plot data from pin",pin,"but this pin was not declared")
 				return
 		
-		ys[idx].append(int(measurement))
+		ys[idx].append(float(measurement))
 		xs[idx].append(int(time)/1000)
 		
 	
