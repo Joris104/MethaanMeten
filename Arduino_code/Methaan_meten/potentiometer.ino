@@ -1,8 +1,8 @@
 #include <SPI.h>
 const int spd = 20000000;
-const SPISettings settings = new SPISettings(spd,MSBFIRST,SPI_MODE0);
-void digitalPotWrite(slave, data){
-  SPI.beginTransaction(settings);
+
+void digitalPotWrite (int slave, int data){
+  SPI.beginTransaction(SPISettings(spd,MSBFIRST,SPI_MODE0));
   pinMode(slave,LOW);
   delay(100);
   //Data transfer

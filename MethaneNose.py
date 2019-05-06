@@ -19,11 +19,12 @@ from matplotlib import style
 #filename is the name of the file where data is saved. 'None' simply uses the date of the measurement. Extention is added automatically and should not be added here0
 #debug controls how much info is displayed on the command prompt. Levels are 0,1 and 2
 #pins controls which pins we are collecting data from
-
+#dataDiscard controls how many data points are discarded at the start of an experiment before the data is considered trustworthy
 port = '/dev/ttyACM0'
 filename = None 
 debug = 1 
 pins = [54] 
+dataDiscard = 5
 
 ####################################################
 #########         Variable Handling        								  ########
@@ -31,7 +32,7 @@ pins = [54]
 
 #We set the filename to the date if none was specified
 
-exitFlag = False
+exitFlag = False #Setting this flag to true will close the connection with the Arduino
 if filename == None:
 		d = date.today()
 		filename = d.strftime("%y-%m-%d")
@@ -114,10 +115,15 @@ def arduinoHandler(port,filename,debug,pins):
 	else:
 		print("Data will be saved to Data/",filename,sep='')
 
-	#Communicating with the Arduino and saving the data	
+	#Communicating with the Arduino and saving the data
+	#The first data is discarded to avoid previous experiments  contaminating this one
+	dataNum = 0
 	while True:
 		try:
 			var = arduino.readline()
+			if dataNum < dataDiscard :
+				dataNum +=1
+				continue
 			w = var.decode()[:-2] #This is to cut the '\n' - useful if we are printing to the cmd shell
 			pin, time, measurement = w.split(',')
 			data_file.write(w+'\n')
